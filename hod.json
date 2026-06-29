@@ -139,14 +139,31 @@
           "teachers_count": 8,
           "students_count": 120,
           "today_sessions_count": 5,
-          "today_attendance_percentage": 87.5
+          "today_attendance_percentage": 87.5,
+          "programs": [
+            {
+              "program_id": 1,
+              "program_name": "BS Computer Science",
+              "program_code": "BSCS",
+              "today_sessions_count": 3,
+              "today_attendance_percentage": 90.0
+            },
+            {
+              "program_id": 2,
+              "program_name": "BS Software Engineering",
+              "program_code": "BSSE",
+              "today_sessions_count": 2,
+              "today_attendance_percentage": 83.3
+            }
+          ]
         }
       },
       "notes": [
         "'department.hod' is only populated when the relation is eager-loaded with 'hod' — here it reflects whoever departments.hod_teacher_id points to, which may or may not be the currently logged-in HOD if multiple teachers exist in the department.",
         "'department.teachers_count' / 'department.students_count' inside the nested DepartmentResource are null here because those are whenCounted() fields not loaded by this endpoint — use the top-level teachers_count/students_count instead.",
         "today_sessions_count counts ALL active+ended sessions today across every batch/program under this department, not just one teacher's classes.",
-        "today_attendance_percentage = round(present_attendance_rows / total_attendance_rows * 100, 1) across all of today's sessions in the department; 0.0 if no sessions ran today."
+        "today_attendance_percentage = round(present_attendance_rows / total_attendance_rows * 100, 1) across all of today's sessions in the department; 0.0 if no sessions ran today.",
+        "'programs' is the NEW per-program breakdown — one entry per Program row under this department (regardless of whether it had any classes today), each with its own today_sessions_count and today_attendance_percentage computed the same way as the department-level totals but filtered to that program's batches. A program with zero sessions today shows today_sessions_count: 0 and today_attendance_percentage: 0.0 — same convention as the department-level fields."
       ]
     },
     "error_response_no_department": {

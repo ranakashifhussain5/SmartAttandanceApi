@@ -45,11 +45,32 @@ class DashboardService
 
         $todaySessions = ClassSession::whereDate('session_date', today())
             ->whereHas('timetable.batch.program', fn ($query) => $query->where('department_id', $department->id))
-            ->with('attendances')
+            ->with(['attendances', 'timetable.batch'])
             ->get();
 
         $studentTotal = $todaySessions->sum(fn (ClassSession $session) => $session->attendances->count());
         $presentTotal = $todaySessions->sum(fn (ClassSession $session) => $session->attendances->where('status', 'present')->count());
+
+        $programs = Program::where('department_id', $department->id)->get();
+
+        $programBreakdown = $programs->map(function (Program $program) use ($todaySessions) {
+            $programSessions = $todaySessions->filter(
+                fn (ClassSession $session) => $session->timetable->batch->program_id === $program->id
+            );
+
+            $programStudentTotal = $programSessions->sum(fn (ClassSession $session) => $session->attendances->count());
+            $programPresentTotal = $programSessions->sum(fn (ClassSession $session) => $session->attendances->where('status', 'present')->count());
+
+            return [
+                'program_id' => $program->id,
+                'program_name' => $program->name,
+                'program_code' => $program->code,
+                'today_sessions_count' => $programSessions->count(),
+                'today_attendance_percentage' => $programStudentTotal > 0
+                    ? round($programPresentTotal / $programStudentTotal * 100, 1)
+                    : 0.0,
+            ];
+        })->values();
 
         return [
             'department' => DepartmentResource::make($department),
@@ -57,6 +78,7 @@ class DashboardService
             'students_count' => Student::where('department_id', $department->id)->count(),
             'today_sessions_count' => $todaySessions->count(),
             'today_attendance_percentage' => $studentTotal > 0 ? round($presentTotal / $studentTotal * 100, 1) : 0.0,
+            'programs' => $programBreakdown,
         ];
     }
 
