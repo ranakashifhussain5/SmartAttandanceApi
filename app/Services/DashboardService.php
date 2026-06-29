@@ -37,7 +37,7 @@ class DashboardService
 
     public function hod(User $user): array
     {
-        $department = $user->teacher?->department;
+        $department = $user->teacher?->department()->with('hod')->first();
 
         if (! $department) {
             throw new BusinessException('No department is assigned to this HOD account.', 404);
