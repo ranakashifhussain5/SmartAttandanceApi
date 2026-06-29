@@ -23,7 +23,7 @@ class StudentController extends Controller
 
     public function store(StoreStudentRequest $request): JsonResponse
     {
-        $student = $this->students->create($request->validated());
+        $student = $this->students->create($request->validated(), verified: true);
 
         return $this->ok(StudentResource::make($student->load(['user', 'department', 'batch'])), 'Student created', 201);
     }
