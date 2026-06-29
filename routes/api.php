@@ -29,6 +29,12 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+// Public lookups needed to populate the cascading Department -> Program ->
+// Batch dropdowns on the (unauthenticated) student registration page.
+Route::get('departments', [DepartmentController::class, 'index']);
+Route::get('programs', [ProgramController::class, 'index']);
+Route::get('batches', [BatchController::class, 'index']);
+
 Route::middleware('auth:sanctum')->group(function () {
 
     // Student-only static paths must be registered before the admin
@@ -53,12 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:admin')->group(function () {
-        Route::get('departments', [DepartmentController::class, 'index']);
         Route::post('departments', [DepartmentController::class, 'store']);
         Route::get('departments/{department}', [DepartmentController::class, 'show']);
         Route::put('departments/{department}', [DepartmentController::class, 'update']);
 
-        Route::get('programs', [ProgramController::class, 'index']);
         Route::post('programs', [ProgramController::class, 'store']);
         Route::get('programs/{program}', [ProgramController::class, 'show']);
         Route::put('programs/{program}', [ProgramController::class, 'update']);
@@ -68,7 +72,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('program-courses/{programCourse}', [ProgramCourseController::class, 'show']);
         Route::put('program-courses/{programCourse}', [ProgramCourseController::class, 'update']);
 
-        Route::get('batches', [BatchController::class, 'index']);
         Route::post('batches', [BatchController::class, 'store']);
         Route::get('batches/{batch}', [BatchController::class, 'show']);
         Route::put('batches/{batch}', [BatchController::class, 'update']);

@@ -7,10 +7,13 @@ use App\Http\Requests\Department\StoreDepartmentRequest;
 use App\Http\Requests\Department\UpdateDepartmentRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
+use App\Services\DepartmentService;
 use Illuminate\Http\JsonResponse;
 
 class DepartmentController extends Controller
 {
+    public function __construct(private DepartmentService $departments) {}
+
     public function index(): JsonResponse
     {
         $departments = Department::withCount(['teachers', 'students'])
@@ -23,7 +26,7 @@ class DepartmentController extends Controller
 
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
-        $department = Department::create($request->validated());
+        $department = $this->departments->create($request->validated());
 
         return $this->ok(DepartmentResource::make($department), 'Department created', 201);
     }
@@ -37,7 +40,7 @@ class DepartmentController extends Controller
 
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
-        $department->update($request->validated());
+        $department = $this->departments->update($department, $request->validated());
 
         return $this->ok(DepartmentResource::make($department), 'Department updated');
     }
