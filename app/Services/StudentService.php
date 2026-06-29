@@ -8,15 +8,14 @@ use Illuminate\Support\Facades\DB;
 
 class StudentService
 {
-    public function create(array $data, bool $verified = false): Student
+    public function create(array $data): Student
     {
-        return DB::transaction(function () use ($data, $verified) {
+        return DB::transaction(function () use ($data) {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => $data['password'],
                 'role' => 'student',
-                'email_verified_at' => $verified ? now() : null,
             ]);
 
             return Student::create([

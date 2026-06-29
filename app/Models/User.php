@@ -15,22 +15,16 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role', 'status', 'email_verified_at'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'status'];
 
-    protected $hidden = ['password', 'remember_token', 'verification_code', 'verification_code_expires_at'];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'verification_code_expires_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function isEmailVerified(): bool
-    {
-        return $this->email_verified_at !== null;
     }
 
     public function teacher(): HasOne

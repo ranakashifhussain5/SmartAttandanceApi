@@ -8,15 +8,14 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherService
 {
-    public function create(array $data, string $role = 'teacher', bool $verified = false): Teacher
+    public function create(array $data, string $role = 'teacher'): Teacher
     {
-        return DB::transaction(function () use ($data, $role, $verified) {
+        return DB::transaction(function () use ($data, $role) {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => $data['password'],
                 'role' => $role,
-                'email_verified_at' => $verified ? now() : null,
             ]);
 
             return Teacher::create([

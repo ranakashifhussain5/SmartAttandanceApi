@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@university.edu',
             'password' => 'password',
             'role' => 'admin',
-            'email_verified_at' => now(),
         ]);
 
         $rooms = collect([
@@ -139,7 +138,7 @@ class DatabaseSeeder extends Seeder
 
     private function makeTeacher(string $name, string $email, Department $department, string $employeeNo, string $designation, string $role = 'teacher'): Teacher
     {
-        $user = User::create(['name' => $name, 'email' => $email, 'password' => 'password', 'role' => $role, 'email_verified_at' => now()]);
+        $user = User::create(['name' => $name, 'email' => $email, 'password' => 'password', 'role' => $role]);
 
         return Teacher::create([
             'user_id' => $user->id,
@@ -152,7 +151,7 @@ class DatabaseSeeder extends Seeder
 
     private function makeStudent(string $name, string $email, string $registrationNo, Department $department, Batch $batch): Student
     {
-        $user = User::create(['name' => $name, 'email' => $email, 'password' => 'password', 'role' => 'student', 'email_verified_at' => now()]);
+        $user = User::create(['name' => $name, 'email' => $email, 'password' => 'password', 'role' => 'student']);
 
         return Student::create([
             'user_id' => $user->id,

@@ -23,7 +23,7 @@ class TeacherController extends Controller
 
     public function store(StoreTeacherRequest $request): JsonResponse
     {
-        $teacher = $this->teachers->create($request->validated(), verified: true);
+        $teacher = $this->teachers->create($request->validated());
 
         return $this->ok(TeacherResource::make($teacher->load(['user', 'department'])), 'Teacher created', 201);
     }
