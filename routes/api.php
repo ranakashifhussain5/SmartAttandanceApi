@@ -13,6 +13,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Student\ScheduleController;
 use App\Http\Controllers\Teacher\ScheduleController as TeacherScheduleController;
@@ -105,6 +106,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:hod')->group(function () {
         Route::get('dashboard/hod', [DashboardController::class, 'hod']);
     });
+
+    // Profile — accessible by all authenticated users
+    Route::get('profile', [ProfileController::class, 'show']);
+    Route::put('profile', [ProfileController::class, 'update']);
+    Route::put('profile/password', [ProfileController::class, 'updatePassword']);
+    Route::delete('profile', [ProfileController::class, 'destroy']);
 
     // Shared across all authenticated roles
     Route::get('sessions', [SessionController::class, 'index']);
