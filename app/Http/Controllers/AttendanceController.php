@@ -35,11 +35,7 @@ class AttendanceController extends Controller
 
     public function report(Request $request): JsonResponse
     {
-        $teacher = $request->user()->teacher;
-
-        if (! $teacher) {
-            throw new BusinessException('Only teachers can view attendance reports.', 403);
-        }
+        $user = $request->user();
 
         $filters = $request->validate([
             'course_id' => ['nullable', 'integer', 'exists:program_courses,id'],
@@ -48,7 +44,23 @@ class AttendanceController extends Controller
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
 
-        $report = $this->reports->generate($teacher, $filters);
+        if ($user->isHod()) {
+            $departmentId = $user->teacher?->department_id;
+
+            if (! $departmentId) {
+                throw new BusinessException('Only HODs with a department can view attendance reports.', 403);
+            }
+
+            $report = $this->reports->generateForDepartment($departmentId, $filters);
+        } else {
+            $teacher = $user->teacher;
+
+            if (! $teacher) {
+                throw new BusinessException('Only teachers can view attendance reports.', 403);
+            }
+
+            $report = $this->reports->generate($teacher, $filters);
+        }
 
         return $this->ok(AttendanceResource::collection($report));
     }

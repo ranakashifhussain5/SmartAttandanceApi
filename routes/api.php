@@ -54,9 +54,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('sessions/{timetable}/start', [SessionController::class, 'start']);
         Route::post('sessions/{session}/end', [SessionController::class, 'end']);
         Route::get('sessions/{session}/attendance', [SessionController::class, 'attendance']);
-        Route::get('attendance/report', [AttendanceController::class, 'report']);
         Route::get('dashboard/teacher', [DashboardController::class, 'teacher']);
         Route::get('teacher/schedule', [TeacherScheduleController::class, 'schedule']);
+    });
+
+    // HOD can view the same report a teacher sees, scoped to their own
+    // teaching load, or their whole department's report when they are HOD.
+    Route::middleware('role:teacher,hod')->group(function () {
+        Route::get('attendance/report', [AttendanceController::class, 'report']);
     });
 
     Route::middleware('role:admin')->group(function () {
