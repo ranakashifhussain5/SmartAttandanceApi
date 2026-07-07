@@ -9,14 +9,21 @@ use App\Http\Resources\TeacherResource;
 use App\Models\Teacher;
 use App\Services\TeacherService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class TeacherController extends Controller
 {
     public function __construct(private TeacherService $teachers) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $teachers = Teacher::with(['user', 'department'])->latest()->paginate(15);
+        $query = Teacher::with(['user', 'department']);
+
+        if ($request->user()->isHod()) {
+            $query->where('department_id', $request->user()->teacher?->department_id);
+        }
+
+        $teachers = $query->latest()->paginate(15);
 
         return $this->ok(TeacherResource::collection($teachers));
     }

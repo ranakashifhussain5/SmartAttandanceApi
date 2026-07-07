@@ -64,6 +64,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('attendance/report', [AttendanceController::class, 'report']);
     });
 
+    // HOD can browse teachers and students, scoped to their own department
+    // (see TeacherController::index / StudentController::index).
+    Route::middleware('role:admin,hod')->group(function () {
+        Route::get('teachers', [TeacherController::class, 'index']);
+        Route::get('students', [AdminStudentController::class, 'index']);
+    });
+
     Route::middleware('role:admin')->group(function () {
         Route::post('departments', [DepartmentController::class, 'store']);
         Route::get('departments/{department}', [DepartmentController::class, 'show']);
@@ -90,12 +97,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('time-slots', [TimeSlotController::class, 'index']);
         Route::post('time-slots', [TimeSlotController::class, 'store']);
 
-        Route::get('teachers', [TeacherController::class, 'index']);
         Route::post('teachers', [TeacherController::class, 'store']);
         Route::get('teachers/{teacher}', [TeacherController::class, 'show']);
         Route::put('teachers/{teacher}', [TeacherController::class, 'update']);
 
-        Route::get('students', [AdminStudentController::class, 'index']);
         Route::post('students', [AdminStudentController::class, 'store']);
         Route::get('students/{student}', [AdminStudentController::class, 'show']);
         Route::put('students/{student}', [AdminStudentController::class, 'update']);

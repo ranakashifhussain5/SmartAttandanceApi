@@ -9,14 +9,21 @@ use App\Http\Resources\StudentResource;
 use App\Models\Student;
 use App\Services\StudentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
     public function __construct(private StudentService $students) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $students = Student::with(['user', 'department', 'batch'])->latest()->paginate(15);
+        $query = Student::with(['user', 'department', 'batch']);
+
+        if ($request->user()->isHod()) {
+            $query->where('department_id', $request->user()->teacher?->department_id);
+        }
+
+        $students = $query->latest()->paginate(15);
 
         return $this->ok(StudentResource::collection($students));
     }
