@@ -19,6 +19,7 @@ class AttendanceService
     public function mark(
         ClassSession $session,
         Student $student,
+        string $detectedUuid,
         int $detectedMajor,
         int $rssi,
         float $latitude,
@@ -52,9 +53,10 @@ class AttendanceService
 
         $this->assertWithinCampusGeofence($session, $student, $latitude, $longitude);
         $this->assertRssiStrongEnough($session, $student, $room, $rssi);
-        $this->assertCorrectRoomDetected($session, $student, $room, $detectedMajor);
+        $this->assertCorrectBeaconDetected($session, $student, $room, $detectedUuid, $detectedMajor);
 
         $attendance->update([
+            'detected_uuid' => $detectedUuid,
             'detected_major' => $detectedMajor,
             'rssi' => $rssi,
             'latitude' => $latitude,
@@ -112,8 +114,19 @@ class AttendanceService
         }
     }
 
-    private function assertCorrectRoomDetected(ClassSession $session, Student $student, Room $room, int $detectedMajor): void
+    private function assertCorrectBeaconDetected(ClassSession $session, Student $student, Room $room, string $detectedUuid, int $detectedMajor): void
     {
+        $expectedUuid = config('attendance.beacon_uuid');
+
+        if (! hash_equals(strtoupper($expectedUuid), strtoupper($detectedUuid))) {
+            $this->logSuspicious($session, $student, 'wrong_beacon_uuid', [
+                'detected_uuid' => $detectedUuid,
+                'expected_uuid' => $expectedUuid,
+            ]);
+
+            throw new BusinessException('BLE beacon is not a recognized attendance beacon.');
+        }
+
         if ($room->beacon_major === null || $detectedMajor !== $room->beacon_major) {
             $this->logSuspicious($session, $student, 'wrong_room_beacon', [
                 'detected_major' => $detectedMajor,

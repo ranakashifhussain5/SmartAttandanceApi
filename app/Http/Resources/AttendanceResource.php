@@ -13,6 +13,7 @@ class AttendanceResource extends JsonResource
             'id' => $this->id,
             'session_id' => $this->session_id,
             'student_id' => $this->student_id,
+            'detected_uuid' => $this->detected_uuid,
             'detected_major' => $this->detected_major,
             'rssi' => $this->rssi,
             'latitude' => $this->latitude,

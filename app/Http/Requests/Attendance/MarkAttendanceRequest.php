@@ -15,6 +15,8 @@ class MarkAttendanceRequest extends FormRequest
     {
         return [
             'session_id' => ['required', 'integer', 'exists:class_sessions,id'],
+            // UUID read off the beacon's iBeacon advertisement during the BLE scan.
+            'detected_uuid' => ['required', 'string', 'regex:/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/'],
             // Room number read off the beacon's iBeacon Major field during the BLE scan.
             'detected_major' => ['required', 'integer', 'min:0', 'max:65535'],
             'rssi' => ['required', 'integer', 'min:-100', 'max:0'],

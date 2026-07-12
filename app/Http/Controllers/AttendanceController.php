@@ -31,6 +31,7 @@ class AttendanceController extends Controller
         $attendance = $this->attendance->mark(
             $session,
             $student,
+            $request->validated('detected_uuid'),
             $request->validated('detected_major'),
             $request->validated('rssi'),
             $request->validated('latitude'),

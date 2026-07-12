@@ -180,6 +180,7 @@ class DatabaseSeeder extends Seeder
             Attendance::create([
                 'session_id' => $session->id,
                 'student_id' => $student->id,
+                'detected_uuid' => $present ? config('attendance.beacon_uuid') : null,
                 'detected_major' => $present ? $room->beacon_major : null,
                 'rssi' => $present ? -60 : null,
                 'latitude' => $present ? 33.6844 : null,
