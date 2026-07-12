@@ -20,10 +20,7 @@ class RoomController extends Controller
 
     public function store(StoreRoomRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $data['wifi_mac'] = strtoupper($data['wifi_mac']);
-
-        $room = Room::create($data);
+        $room = Room::create($request->validated());
 
         return $this->ok(RoomResource::make($room), 'Room created', 201);
     }
@@ -35,13 +32,7 @@ class RoomController extends Controller
 
     public function update(UpdateRoomRequest $request, Room $room): JsonResponse
     {
-        $data = $request->validated();
-
-        if (isset($data['wifi_mac'])) {
-            $data['wifi_mac'] = strtoupper($data['wifi_mac']);
-        }
-
-        $room->update($data);
+        $room->update($request->validated());
 
         return $this->ok(RoomResource::make($room), 'Room updated');
     }

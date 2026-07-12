@@ -30,9 +30,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $rooms = collect([
-            ['room_no' => 'Room-101', 'wifi_name' => 'Lab-WiFi-101', 'wifi_mac' => 'AA:BB:CC:00:01:01'],
-            ['room_no' => 'Room-102', 'wifi_name' => 'Lab-WiFi-102', 'wifi_mac' => 'AA:BB:CC:00:01:02'],
-            ['room_no' => 'Room-103', 'wifi_name' => 'Lab-WiFi-103', 'wifi_mac' => 'AA:BB:CC:00:01:03'],
+            ['room_no' => 'Room-101', 'beacon_major' => 101],
+            ['room_no' => 'Room-102', 'beacon_major' => 102],
+            ['room_no' => 'Room-103', 'beacon_major' => 103],
         ])->map(fn ($data) => Room::create($data));
 
         $timeSlots = collect([
@@ -180,7 +180,10 @@ class DatabaseSeeder extends Seeder
             Attendance::create([
                 'session_id' => $session->id,
                 'student_id' => $student->id,
-                'wifi_mac_detected' => $present ? $room->wifi_mac : null,
+                'detected_major' => $present ? $room->beacon_major : null,
+                'rssi' => $present ? -60 : null,
+                'latitude' => $present ? 33.6844 : null,
+                'longitude' => $present ? 73.0479 : null,
                 'status' => $present ? 'present' : 'absent',
                 'marked_at' => $present ? $session->session_date->copy()->setTimeFromTimeString($session->start_time) : null,
             ]);

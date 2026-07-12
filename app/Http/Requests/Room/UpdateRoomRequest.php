@@ -16,11 +16,11 @@ class UpdateRoomRequest extends FormRequest
     {
         return [
             'room_no' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('rooms', 'room_no')->ignore($this->route('room'))],
-            'wifi_name' => ['sometimes', 'required', 'string', 'max:100'],
-            'wifi_mac' => [
-                'sometimes', 'required', 'string', 'regex:/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/',
-                Rule::unique('rooms', 'wifi_mac')->ignore($this->route('room')),
+            'beacon_major' => [
+                'sometimes', 'required', 'integer', 'min:0', 'max:65535',
+                Rule::unique('rooms', 'beacon_major')->ignore($this->route('room')),
             ],
+            'rssi_threshold' => ['sometimes', 'nullable', 'integer', 'min:-100', 'max:0'],
         ];
     }
 }

@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Attendance extends Model
+class SuspiciousAttempt extends Model
 {
-    protected $table = 'attendance';
+    const UPDATED_AT = null;
 
-    protected $fillable = ['session_id', 'student_id', 'detected_major', 'rssi', 'latitude', 'longitude', 'status', 'marked_at'];
+    protected $fillable = ['session_id', 'student_id', 'fail_reason', 'payload'];
 
     protected function casts(): array
     {
         return [
-            'marked_at' => 'datetime',
+            'payload' => 'array',
         ];
     }
 

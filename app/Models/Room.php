@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
-    protected $fillable = ['room_no', 'wifi_name', 'wifi_mac'];
+    protected $fillable = ['room_no', 'beacon_major', 'rssi_threshold'];
 
     public function timetables(): HasMany
     {

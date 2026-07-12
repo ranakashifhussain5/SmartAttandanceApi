@@ -15,7 +15,11 @@ class MarkAttendanceRequest extends FormRequest
     {
         return [
             'session_id' => ['required', 'integer', 'exists:class_sessions,id'],
-            'wifi_mac' => ['required', 'string', 'regex:/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/'],
+            // Room number read off the beacon's iBeacon Major field during the BLE scan.
+            'detected_major' => ['required', 'integer', 'min:0', 'max:65535'],
+            'rssi' => ['required', 'integer', 'min:-100', 'max:0'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
         ];
     }
 }

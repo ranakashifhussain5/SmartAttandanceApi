@@ -12,8 +12,8 @@ class RoomResource extends JsonResource
         return [
             'id' => $this->id,
             'room_no' => $this->room_no,
-            'wifi_name' => $this->wifi_name,
-            'wifi_mac' => $this->wifi_mac,
+            'beacon_major' => $this->beacon_major,
+            'rssi_threshold' => $this->rssi_threshold,
             'created_at' => $this->created_at,
         ];
     }

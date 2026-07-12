@@ -15,8 +15,9 @@ class StoreRoomRequest extends FormRequest
     {
         return [
             'room_no' => ['required', 'string', 'max:50', 'unique:rooms,room_no'],
-            'wifi_name' => ['required', 'string', 'max:100'],
-            'wifi_mac' => ['required', 'string', 'regex:/^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/', 'unique:rooms,wifi_mac'],
+            // Must match BEACON_ROOM_NUMBER flashed into this room's ESP32-S3 beacon_config.h.
+            'beacon_major' => ['required', 'integer', 'min:0', 'max:65535', 'unique:rooms,beacon_major'],
+            'rssi_threshold' => ['nullable', 'integer', 'min:-100', 'max:0'],
         ];
     }
 }

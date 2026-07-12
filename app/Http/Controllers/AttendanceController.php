@@ -28,7 +28,14 @@ class AttendanceController extends Controller
 
         $session = ClassSession::with('timetable.room')->findOrFail($request->validated('session_id'));
 
-        $attendance = $this->attendance->mark($session, $student, $request->validated('wifi_mac'));
+        $attendance = $this->attendance->mark(
+            $session,
+            $student,
+            $request->validated('detected_major'),
+            $request->validated('rssi'),
+            $request->validated('latitude'),
+            $request->validated('longitude'),
+        );
 
         return $this->ok(AttendanceResource::make($attendance), 'Attendance marked as present');
     }

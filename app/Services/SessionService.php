@@ -56,9 +56,9 @@ class SessionService
             $this->notifications->sendMany(
                 $students->pluck('user_id'),
                 'Attendance Started',
-                "Attendance has started for {$timetable->course->course_title}. Connect to \"{$room->wifi_name}\" to mark your attendance.",
+                "Attendance has started for {$timetable->course->course_title}. Open the app in Room {$room->room_no} to mark your attendance.",
                 'attendance_started',
-                ['session_id' => $session->id, 'room_wifi_mac' => $room->wifi_mac, 'room_wifi_name' => $room->wifi_name],
+                ['session_id' => $session->id, 'room_id' => $room->id, 'room_no' => $room->room_no],
             );
 
             $this->auditLog->log($teacherUser->id, 'session_started', "Started session for timetable #{$timetable->id}", $session);
