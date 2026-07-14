@@ -29,10 +29,12 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+        $devBeaconUuid = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
+
         $rooms = collect([
-            ['room_no' => 'Room-101', 'beacon_major' => 101],
-            ['room_no' => 'Room-102', 'beacon_major' => 102],
-            ['room_no' => 'Room-103', 'beacon_major' => 103],
+            ['room_no' => 'Room-101', 'beacon_major' => 101, 'beacon_uuid' => $devBeaconUuid],
+            ['room_no' => 'Room-102', 'beacon_major' => 102, 'beacon_uuid' => $devBeaconUuid],
+            ['room_no' => 'Room-103', 'beacon_major' => 103, 'beacon_uuid' => $devBeaconUuid],
         ])->map(fn ($data) => Room::create($data));
 
         $timeSlots = collect([
@@ -180,7 +182,7 @@ class DatabaseSeeder extends Seeder
             Attendance::create([
                 'session_id' => $session->id,
                 'student_id' => $student->id,
-                'detected_uuid' => $present ? config('attendance.beacon_uuid') : null,
+                'detected_uuid' => $present ? $room->beacon_uuid : null,
                 'detected_major' => $present ? $room->beacon_major : null,
                 'rssi' => $present ? -60 : null,
                 'latitude' => $present ? 33.6844 : null,

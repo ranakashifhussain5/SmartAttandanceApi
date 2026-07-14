@@ -13,6 +13,7 @@ class RoomResource extends JsonResource
             'id' => $this->id,
             'room_no' => $this->room_no,
             'beacon_major' => $this->beacon_major,
+            'beacon_uuid' => $this->beacon_uuid,
             'rssi_threshold' => $this->rssi_threshold,
             'created_at' => $this->created_at,
         ];

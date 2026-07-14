@@ -116,12 +116,10 @@ class AttendanceService
 
     private function assertCorrectBeaconDetected(ClassSession $session, Student $student, Room $room, string $detectedUuid, int $detectedMajor): void
     {
-        $expectedUuid = config('attendance.beacon_uuid');
-
-        if (! hash_equals(strtoupper($expectedUuid), strtoupper($detectedUuid))) {
+        if (! hash_equals(strtoupper($room->beacon_uuid), strtoupper($detectedUuid))) {
             $this->logSuspicious($session, $student, 'wrong_beacon_uuid', [
                 'detected_uuid' => $detectedUuid,
-                'expected_uuid' => $expectedUuid,
+                'expected_uuid' => $room->beacon_uuid,
             ]);
 
             throw new BusinessException('BLE beacon is not a recognized attendance beacon.');
