@@ -16,6 +16,7 @@ class TeacherService
                 'email' => $data['email'],
                 'password' => $data['password'],
                 'role' => $role,
+                'avatar' => $data['avatar'] ?? null,
             ]);
 
             return Teacher::create([

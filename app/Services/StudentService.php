@@ -16,6 +16,7 @@ class StudentService
                 'email' => $data['email'],
                 'password' => $data['password'],
                 'role' => 'student',
+                'avatar' => $data['avatar'] ?? null,
             ]);
 
             return Student::create([

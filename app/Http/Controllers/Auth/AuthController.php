@@ -25,11 +25,15 @@ class AuthController extends Controller
     {
         $data = $request->validated();
 
+        if ($request->hasFile('avatar')) {
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
         $user = match ($data['role']) {
             'teacher' => $this->teachers->create($data)->user,
             'hod' => $this->teachers->create($data, 'hod')->user,
             'student' => $this->students->create($data)->user,
-            default => User::create(['name' => $data['name'], 'email' => $data['email'], 'password' => $data['password'], 'role' => $data['role']]),
+            default => User::create(['name' => $data['name'], 'email' => $data['email'], 'password' => $data['password'], 'role' => $data['role'], 'avatar' => $data['avatar'] ?? null]),
         };
 
         $token = $user->createToken('api-token')->plainTextToken;
