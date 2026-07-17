@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Session\StartSessionRequest;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\ClassSessionResource;
 use App\Models\ClassSession;
@@ -18,7 +19,7 @@ class SessionController extends Controller
     {
         $user = $request->user();
 
-        $query = ClassSession::with(['timetable.course', 'timetable.room', 'timetable.batch', 'timetable.teacher.user']);
+        $query = ClassSession::with(['timetable.course', 'timetable.room', 'timetable.batch', 'timetable.teacher.user', 'room']);
 
         if ($user->isTeacher()) {
             $query->whereHas('timetable', fn ($q) => $q->where('teacher_id', $user->teacher?->id));
@@ -48,16 +49,16 @@ class SessionController extends Controller
     {
         $this->authorize('view', $session);
 
-        $session->load(['timetable.course', 'timetable.room', 'timetable.batch', 'timetable.teacher.user', 'attendances']);
+        $session->load(['timetable.course', 'timetable.room', 'timetable.batch', 'timetable.teacher.user', 'room', 'attendances']);
 
         return $this->ok(ClassSessionResource::make($session));
     }
 
-    public function start(Request $request, Timetable $timetable): JsonResponse
+    public function start(StartSessionRequest $request, Timetable $timetable): JsonResponse
     {
         $this->authorize('start', $timetable);
 
-        $session = $this->sessions->start($timetable, $request->user());
+        $session = $this->sessions->start($timetable, $request->user(), $request->validated('room_id'));
 
         return $this->ok(ClassSessionResource::make($session->load('attendances')), 'Session started', 201);
     }

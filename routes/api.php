@@ -83,6 +83,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('timetables', [TimetableController::class, 'index']);
     });
 
+    // Teachers/HODs need the room list to pick a same-day override room when
+    // starting a session (see SessionService::start's room_id support).
+    // Creating/editing rooms stays admin-only below.
+    Route::middleware('role:admin,hod,teacher')->group(function () {
+        Route::get('rooms', [RoomController::class, 'index']);
+    });
+
     Route::middleware('role:admin')->group(function () {
         Route::post('departments', [DepartmentController::class, 'store']);
         Route::get('departments/{department}', [DepartmentController::class, 'show']);
@@ -101,7 +108,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('batches/{batch}', [BatchController::class, 'show']);
         Route::put('batches/{batch}', [BatchController::class, 'update']);
 
-        Route::get('rooms', [RoomController::class, 'index']);
         Route::post('rooms', [RoomController::class, 'store']);
         Route::get('rooms/{room}', [RoomController::class, 'show']);
         Route::put('rooms/{room}', [RoomController::class, 'update']);

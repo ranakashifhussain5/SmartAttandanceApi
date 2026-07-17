@@ -49,7 +49,7 @@ class AttendanceService
             throw new BusinessException('You have already marked attendance for this session.', 409);
         }
 
-        $room = $session->timetable->room;
+        $room = $session->effectiveRoom();
 
         $this->assertWithinCampusGeofence($session, $student, $latitude, $longitude);
         $this->assertRssiStrongEnough($session, $student, $room, $rssi);

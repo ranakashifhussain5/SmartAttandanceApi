@@ -15,7 +15,7 @@ class ClassSession extends Model
 {
     protected $table = 'class_sessions';
 
-    protected $fillable = ['timetable_id', 'session_date', 'start_time', 'end_time', 'status'];
+    protected $fillable = ['timetable_id', 'room_id', 'session_date', 'start_time', 'end_time', 'status'];
 
     protected function casts(): array
     {
@@ -29,8 +29,22 @@ class ClassSession extends Model
         return $this->belongsTo(Timetable::class);
     }
 
+    /**
+     * Per-day room override. Null means this session uses the timetable's
+     * regular room — see effectiveRoom().
+     */
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
+    }
+
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class, 'session_id');
+    }
+
+    public function effectiveRoom(): Room
+    {
+        return $this->room ?? $this->timetable->room;
     }
 }

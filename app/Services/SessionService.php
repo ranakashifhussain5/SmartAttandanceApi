@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\BusinessException;
 use App\Models\Attendance;
 use App\Models\ClassSession;
+use App\Models\Room;
 use App\Models\Student;
 use App\Models\Timetable;
 use App\Models\User;
@@ -18,7 +19,7 @@ class SessionService
         private AuditLogService $auditLog,
     ) {}
 
-    public function start(Timetable $timetable, User $teacherUser): ClassSession
+    public function start(Timetable $timetable, User $teacherUser, ?int $roomId = null): ClassSession
     {
         $this->assertWithinPeriodWindow($timetable);
 
@@ -33,9 +34,16 @@ class SessionService
             throw new BusinessException('A session for this class is already active today.', 409);
         }
 
-        return DB::transaction(function () use ($timetable, $teacherUser, $today) {
+        $roomChanged = $roomId !== null && $roomId !== $timetable->room_id;
+        $room = $roomChanged ? Room::findOrFail($roomId) : $timetable->room;
+
+        $this->assertRoomHasBeacon($room);
+        $this->assertRoomIsFree($room, $today);
+
+        return DB::transaction(function () use ($timetable, $teacherUser, $today, $roomId, $roomChanged, $room) {
             $session = ClassSession::create([
                 'timetable_id' => $timetable->id,
+                'room_id' => $roomChanged ? $roomId : null,
                 'session_date' => $today,
                 'start_time' => $timetable->timeSlot->start_time,
                 'end_time' => $timetable->timeSlot->end_time,
@@ -54,20 +62,50 @@ class SessionService
                 ])->all());
             }
 
-            $room = $timetable->room;
+            $message = $roomChanged
+                ? "Room changed for today's class. Attendance has started for {$timetable->course->course_title} — open the app in Room {$room->room_no} to mark your attendance."
+                : "Attendance has started for {$timetable->course->course_title}. Open the app in Room {$room->room_no} to mark your attendance.";
 
             $this->notifications->sendMany(
                 $students->pluck('user_id'),
                 'Attendance Started',
-                "Attendance has started for {$timetable->course->course_title}. Open the app in Room {$room->room_no} to mark your attendance.",
+                $message,
                 'attendance_started',
-                ['session_id' => $session->id, 'room_id' => $room->id, 'room_no' => $room->room_no],
+                ['session_id' => $session->id, 'room_id' => $room->id, 'room_no' => $room->room_no, 'room_changed' => $roomChanged],
             );
 
-            $this->auditLog->log($teacherUser->id, 'session_started', "Started session for timetable #{$timetable->id}", $session);
+            $auditMessage = "Started session for timetable #{$timetable->id}"
+                .($roomChanged ? " (room changed to {$room->room_no} for today)" : '');
 
-            return $session->load(['timetable.course', 'timetable.room', 'timetable.batch', 'timetable.teacher']);
+            $this->auditLog->log($teacherUser->id, 'session_started', $auditMessage, $session);
+
+            return $session->load(['timetable.course', 'timetable.room', 'timetable.batch', 'timetable.teacher', 'room']);
         });
+    }
+
+    private function assertRoomHasBeacon(Room $room): void
+    {
+        if (! $room->beacon_uuid || $room->beacon_major === null) {
+            throw new BusinessException("Room {$room->room_no} has no attendance beacon configured and can't be used to start a session.");
+        }
+    }
+
+    private function assertRoomIsFree(Room $room, string $today): void
+    {
+        $occupied = ClassSession::where('session_date', $today)
+            ->where('status', 'active')
+            ->where(function ($query) use ($room) {
+                $query->where('room_id', $room->id)
+                    ->orWhere(function ($query) use ($room) {
+                        $query->whereNull('room_id')
+                            ->whereHas('timetable', fn ($t) => $t->where('room_id', $room->id));
+                    });
+            })
+            ->exists();
+
+        if ($occupied) {
+            throw new BusinessException("Room {$room->room_no} is already in use by another active session right now.", 409);
+        }
     }
 
     private function assertWithinPeriodWindow(Timetable $timetable): void
