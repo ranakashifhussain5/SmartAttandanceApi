@@ -37,6 +37,11 @@ class User extends Authenticatable
         return $this->hasOne(Student::class);
     }
 
+    public function staff(): HasOne
+    {
+        return $this->hasOne(Staff::class);
+    }
+
     public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class)->latest();
@@ -71,5 +76,16 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === 'student';
+    }
+
+    /**
+     * Non-teaching administrative office holder (Examination Officer,
+     * Registrar, Transport Officer, ...) — never granted attendance-module
+     * access, only Application Tracking (which is open to any authenticated
+     * user, so no special-casing is needed there).
+     */
+    public function isStaff(): bool
+    {
+        return $this->role === 'staff';
     }
 }

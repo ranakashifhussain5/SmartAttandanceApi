@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\ProgramCourseController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TimeSlotController;
@@ -112,6 +113,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('teachers', [TeacherController::class, 'store']);
         Route::get('teachers/{teacher}', [TeacherController::class, 'show']);
         Route::put('teachers/{teacher}', [TeacherController::class, 'update']);
+
+        // Non-teaching administrative office holders (Examination Officer,
+        // Registrar, Transport Officer, ...) - admin-only, university-wide,
+        // no HOD-scoped index like teachers/students have.
+        Route::get('staff', [StaffController::class, 'index']);
+        Route::post('staff', [StaffController::class, 'store']);
+        Route::get('staff/{staff}', [StaffController::class, 'show']);
+        Route::put('staff/{staff}', [StaffController::class, 'update']);
 
         Route::post('students', [AdminStudentController::class, 'store']);
         Route::get('students/{student}', [AdminStudentController::class, 'show']);
