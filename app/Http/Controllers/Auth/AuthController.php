@@ -114,6 +114,7 @@ class AuthController extends Controller
         $expected = match ($user->role) {
             'student' => $user->student?->registration_no,
             'teacher', 'hod' => $user->teacher?->employee_no,
+            'staff' => $user->staff?->employee_no,
             default => null,
         };
 

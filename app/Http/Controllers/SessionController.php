@@ -36,6 +36,12 @@ class SessionController extends Controller
             } else {
                 $query->whereHas('timetable.batch.program', fn ($q) => $q->where('department_id', $user->teacher?->department_id));
             }
+        } elseif (! $user->isAdmin()) {
+            // Only admin sees every session unfiltered. Any role that isn't
+            // explicitly handled above (e.g. staff, who have no attendance-
+            // module access at all) gets nothing, rather than silently
+            // inheriting admin-level visibility here.
+            $query->whereRaw('1 = 0');
         }
 
         // session_date is a date column, so same-day sessions tie; order by
